@@ -1,0 +1,58 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- master
+
+pool:
+  vmImage: 'Ubuntu-16.04'
+
+variables:
+  sources_dir: /opt/rt-n56u
+
+steps:
+  - script: |
+      sudo apt-get update
+      sudo apt-get install -y git sudo module-init-tools autopoint autoconf automake bison build-essential flex gawk gettext gperf libtool pkg-config zlib1g-dev libgmp3-dev libmpc-dev libmpfr-dev texinfo python-docutils mc
+    displayName: 'Prepare build environment'
+
+  - script: |
+      sudo cp -rfv newifi-mini /opt
+      sudo cp -fv patch.sh /opt
+    workingDirectory: '$(Build.SourcesDirectory)'
+    displayName: 'Prepare newifi mini patch files'
+
+  - script: |
+      sudo git clone https://bitbucket.org/padavan/rt-n56u.git $(sources_dir)
+    displayName: 'prepare padavan sources'
+
+  - script: |
+      sudo ./clean_sources
+      sudo ./build_toolchain
+    workingDirectory: '$(sources_dir)/toolchain-mipsel'
+    displayName: 'Build toolchain'
+  
+  - script: |
+      sudo chmod +x patch.sh
+      sudo ./patch.sh
+    workingDirectory: '/opt'
+    displayName: 'Patch sources'
+  
+  - script: |
+      sudo ./clear_tree
+      sudo ./build_firmware
+    workingDirectory: '$(sources_dir)/trunk'
+    displayName: 'Build firmware'
+
+  - script: |
+      cp -v /opt/rt-n56u/trunk/images/*.trx .
+      sha256sum *.trx | tee sha256.txt
+    workingDirectory: '$(Build.ArtifactStagingDirectory)'
+    displayName: 'Prepare firmware and calculate sha256'
+
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathtoPublish: $(Build.ArtifactStagingDirectory)
+      artifactName: 'newifi-mini'
