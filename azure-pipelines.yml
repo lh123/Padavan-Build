@@ -26,7 +26,7 @@ steps:
 
   - script: |
       sudo git clone https://bitbucket.org/padavan/rt-n56u.git $(sources_dir)
-    displayName: 'prepare padavan sources'
+    displayName: 'Prepare padavan sources'
 
   - script: |
       sudo ./clean_sources
