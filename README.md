@@ -4,3 +4,4 @@
 * LAN: 192.168.1.1
 * Account: admin 
 * Password: admin
+* Wifi: 1234567890
