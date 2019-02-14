@@ -1,11 +1,3 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
-trigger:
-- master
-
 pool:
   vmImage: 'Ubuntu-16.04'
 
@@ -26,7 +18,7 @@ steps:
 
   - script: |
       sudo git clone https://bitbucket.org/padavan/rt-n56u.git $(sources_dir)
-    displayName: 'prepare padavan sources'
+    displayName: 'Get padavan sources'
 
   - script: |
       sudo ./clean_sources
