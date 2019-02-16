@@ -13,7 +13,6 @@ steps:
   - script: |
       sudo cp -rfv newifi-mini /opt
       sudo cp -fv patch.sh /opt
-    workingDirectory: '$(Build.SourcesDirectory)'
     displayName: 'Prepare newifi mini patch files'
 
   - script: |
@@ -21,27 +20,27 @@ steps:
     displayName: 'Get padavan sources'
 
   - script: |
+      cd $(sources_dir)/toolchain-mipsel
       sudo ./clean_sources
       sudo ./build_toolchain
-    workingDirectory: '$(sources_dir)/toolchain-mipsel'
     displayName: 'Build toolchain'
   
   - script: |
+      cd /opt
       sudo chmod +x patch.sh
       sudo ./patch.sh
-    workingDirectory: '/opt'
     displayName: 'Patch sources'
   
   - script: |
+      cd $(sources_dir)/trunk
       sudo ./clear_tree
       sudo ./build_firmware
-    workingDirectory: '$(sources_dir)/trunk'
     displayName: 'Build firmware'
 
   - script: |
-      cp -v /opt/rt-n56u/trunk/images/*.trx .
+      cd $(Build.ArtifactStagingDirectory)
+      cp -v $(sources_dir)/trunk/images/*.trx .
       sha256sum *.trx | tee sha256.txt
-    workingDirectory: '$(Build.ArtifactStagingDirectory)'
     displayName: 'Prepare firmware and calculate sha256'
 
   - task: PublishBuildArtifacts@1
