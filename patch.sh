@@ -11,3 +11,5 @@ fi
 if [ -d "${SRC_DIR}/trunk/user/" ] ; then
     cp -frv "./newifi-mini/user/" "${SRC_DIR}/trunk/"
 fi
+
+awk '{sub(/--short /, "--short=8 "); print $0 > "/opt/rt-n56u/trunk/versions.inc"}' /opt/rt-n56u/trunk/versions.inc
